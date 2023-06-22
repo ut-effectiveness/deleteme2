@@ -1,0 +1,100 @@
+---
+title: "Getting Started With ggplot2"
+author: "Joy Lindsay"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(purrr)
+
+make_credits <- function(college) {
+  slope <- rnorm(1, 500, 500)
+  intercept <- rnorm(1, 20000, 2000) %>% floor()
+  x <- 1:10
+  college <- rep(college, 10)
+  noise <- rnorm(10, 1000, 1000)
+  
+  credits <- intercept + slope*x + noise
+  
+  output_df <- tibble(college = college, year = 2010 + x, credits = credits ) %>% 
+    mutate(credits = as.integer(credits))
+  
+  return(output_df)
+}
+
+
+colleges <- c('Fine Art', 'Business', 'Physical Science', 'Social Science', 
+              'Health Science', 'Humanities', 'Life Science', 'Earl')
+
+credits_by_college <- map_dfr(colleges, make_credits)
+```
+
+```{r}
+library(gt)
+head(credits_by_college) %>% gt()
+```
+
+```{r}
+ggplot(credits_by_college)
+```
+
+```{r}
+ggplot(credits_by_college, aes(x = year, y = credits))
+```
+
+```{r}
+ggplot(credits_by_college, aes(x = year, y = credits)) + geom_line()
+```
+```{r}
+ggplot(credits_by_college, aes(x = year, y = credits, group = college)) + geom_line()
+```
+```{r}
+ggplot(credits_by_college, aes(x = year, y = credits, group = college, color = college)) + 
+  geom_line() + geom_point(size = .5, alpha = .8)
+```
+```{r}
+library(scales)
+```
+
+```{r}
+ggplot(credits_by_college, aes(x = year, y = credits, group = college, color = college)) + 
+  geom_line() + geom_point(size = .5, alpha = .8) +
+  scale_x_continuous(breaks = pretty_breaks()) +
+  scale_y_continuous(labels = comma)
+```
+```{r}
+ggplot(credits_by_college, aes(x = year, y = credits, group = college, color = college)) + 
+  geom_line() + geom_point(size = .5, alpha = .8) +
+  scale_x_continuous(breaks = pretty_breaks()) +
+  scale_y_continuous(labels = comma) +
+  guides(color = guide_legend(title = "College"))
+
+```
+```{r}
+my_colors <- c("#8E877C", "#E7CA8C", "#F6BC8C", "#C87D55", "#868662", "#AD7C82", 
+               "#DC5A3F", "#668CB0")
+names(my_colors) <- colleges
+
+ggplot(credits_by_college, aes(x = year, y = credits, group = college, color = college)) + 
+  geom_line() + geom_point(size = .5, alpha = .8) +
+  scale_x_continuous(breaks = pretty_breaks()) +
+  scale_y_continuous(labels = comma) +
+  guides(color = guide_legend(title = "College")) +
+  labs(title = "Credits by college",
+       subtitle = "Credits taken within each college 2011-2020",
+       caption = "Data supplied by OIE",
+       x = 'Year',
+       y = 'Credits') +
+  theme_minimal() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    plot.subtitle = element_text(color = "#a6a6a6", size = 10),
+    plot.caption = element_text(color = '#a6a6a6', size = 8, face = 'italic')
+  ) +
+  scale_colour_manual(values = my_colors)
+```
+
