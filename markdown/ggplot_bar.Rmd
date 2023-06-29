@@ -22,12 +22,6 @@ graduation_raw <- utHelpR::get_data_from_sql_file(file_name="graduation.sql",
                                                context="project")
 ```
 
-```{r}
-test <- utHelpR::get_data_from_sql_file(file_name="test.sql",
-                                               dsn="edify",
-                                               context="project")
-```
-
 Make a dataframe filtered to use only associates from the degree column in graduation_raw.
 
 ```{r}
@@ -128,6 +122,7 @@ ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
   )
 
 ```
+
 # There is no need to reinvent the wheel.
 
 One of the best things about creating visualizations using ggplot is that code is easily modified and repurposed. Save time and energy/wark smarter not harder: Copy, paste, edit, knit. 
@@ -136,7 +131,7 @@ When I make something I like and will use often, I save an example in an R proje
 
 Starting again, here we are going to create the same style of bar chart above but now we'll filter the data to show us the number of bachelors degrees awarded by academic year over time.
 
-```{r, echo = FALSE}
+```{r}
 bachelors_df <- graduation_raw %>%
   filter(degree == 'Bachelors') %>%
   select(academic_year_desc, degree, headcount) %>%
@@ -150,7 +145,7 @@ I started getting picky about the formatting on the headcount bars, I wanted the
 
 https://stackoverflow.com/questions/56490813/how-do-i-add-a-comma-separator-to-a-text-label-in-geom-text
 
-```{r, echo=FALSE}
+```{r}
 ggplot(bachelors_df, aes(x = academic_year_desc, y = headcount)) +
   geom_bar(stat="identity",
            color = "#BA1C21", ## This hex code is Rock Red from UT Branding.
