@@ -44,7 +44,7 @@ ggplot(associates_df, aes(x = reporting_year, y = headcount)) +
 
 ![EW](ew.png)
 
-This chart tells the viewer nothing. There is no way to determine what headcount is being measured by academic year. This is very likely to cause irritation.
+This chart tells the viewer nothing. There is no way to determine what headcount is being measured by academic year. This is very (definitely) likely to cause irritation.
 
 Moving on...
 
@@ -58,13 +58,13 @@ ggplot(associates_df, aes(x = reporting_year, y = headcount)) +
            color = "#003058", #This hex code is Brooks Blue UT Branding.
            fill = "#003058") +
   labs(title = "Associate Degrees Awarded",
-       subtitle = "Credentials by academic year", 
+       subtitle = "Credentials by reporting year", 
        caption = "Data supplied by OIE", #Claim responsibility.
-       x = 'Academic Year',
+       x = 'Reporting Year',
        y = 'Credentials Awarded')
 ```
 
-Now we're getting somewhere! Using geom_text, the associates degrees awarded headcount by academic year has been labeled. 
+Now we're getting somewhere! Using geom_text, the associates degrees awarded headcount by reporting year has been labeled. 
 
 This is a usable visualization, but there is room for improvement.
 
@@ -74,9 +74,9 @@ ggplot(associates_df, aes(x = reporting_year, y = headcount)) +
            color = "#003058", #This hex code is Brooks Blue UT Branding.
            fill = "#003058") +
   labs(title = "Associate Degrees Awarded",
-       subtitle = "Credentials by academic year",
+       subtitle = "Credentials by reporting year",
        caption = "Data supplied by OIE", #Take ownership.
-       x = 'Academic Year',
+       x = 'Reporting Year',
        y = 'Credentials Awarded') + 
   geom_text(aes(label = headcount), size = 10/.pt, vjust = -.4)
 ```
@@ -89,9 +89,9 @@ ggplot(associates_df, aes(x = reporting_year, y = headcount)) +
            color = "#003058", #This hex code is Brooks Blue UT Branding.
            fill = "#003058") +
   labs(title = "Associate Degrees Awarded",
-       subtitle = "Credentials by academic year",
+       subtitle = "Credentials by reporting year",
        caption = "Data supplied by OIE", #Take ownership.
-       x = 'Academic Year',
+       x = 'Reporting Year',
        y = 'Credentials Awarded') + 
   geom_text(aes(label = headcount), size = 10/.pt, vjust = -.4) +
   theme_minimal()
@@ -105,9 +105,9 @@ ggplot(associates_df, aes(x = reporting_year, y = headcount)) +
            color = "#003058", #This hex code is Brooks Blue UT Branding.
            fill = "#003058") +
   labs(title = "Associate Degrees Awarded",
-       subtitle = "Credentials by academic year",
+       subtitle = "Credentials by reporting year",
        caption = "Data supplied by OIE", #Take ownership.
-       x = 'Academic Year',
+       x = 'Reporting Year',
        y = 'Credentials Awarded') + 
   geom_text(aes(label = headcount), size = 10/.pt, vjust = -.4) +
   theme_minimal() +
@@ -150,9 +150,9 @@ ggplot(bachelors_df, aes(x = reporting_year, y = headcount)) +
            color = "#BA1C21", ## This hex code is Rock Red from UT Branding.
            fill = "#BA1C21") +
     labs(title = "Bachelors Degrees Awarded",
-       subtitle = "Credentials by academic year",
+       subtitle = "Credentials by reporting year",
        caption = "Data supplied by OIE", #Take ownership.
-       x = 'Academic Year',
+       x = 'Reporting Year',
        y = 'Credentials Awarded') + 
   geom_text(aes(label = scales::comma(headcount)), ## Formatting headcount with commas trick.
             size = 10/ .pt, vjust = -.4) + 
