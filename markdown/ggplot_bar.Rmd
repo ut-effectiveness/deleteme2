@@ -1,30 +1,173 @@
 ---
-title: "ggplot_barchart"
+title: "Creating bar charts using ggplot2t"
 author: "Joy Lindsay"
 date: "`r Sys.Date()`"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r include=FALSE}
+library(utHelpR)
+library(tidyverse)
+library(purrr)
+library(scales)
 ```
 
-## R Markdown
+Using ggplot2, let's walk through making a bar chart that goes from gross to great.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Begin by bringing in the data. Here I am connecting SQL I wrote that answers a request I have to show the growth of credentials awarded to graduating students over time by degree type.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r, echo = FALSE}
+graduation_raw <- utHelpR::get_data_from_sql_file(file_name="graduation.sql",
+                                               dsn="edify",
+                                               context="project")
 ```
 
-## Including Plots
+Make a dataframe filtered to use only associates data from the degree column from graduation_raw.
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+associates_df <- graduation_raw %>%
+  filter(degree == 'Associates') %>%
+  select(academic_year_desc, degree, headcount) %>%
+  group_by(academic_year_desc, degree) %>%
+  summarise(headcount = n(), .groups = "drop")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+With our new dataframe, it's time to bring in ggplot to build a bar chart.
+
+Ew, David!
+
+(Also, a good way to get fired.)
+
+This chart tells the viewer nothing. There is no way to determine what headcount is being measured by academic year.
+
+```{r, echo=FALSE}
+ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
+  geom_bar(stat = "identity")
+```
+
+A little better, still basic. We've added some color and some labels so it is known that the headcount is associates degrees awarded by academic year, but we still don't know how many associates degrees are represented by each bar of the chart. 
+
+We have also claimed responsibility for "Who made this?"
+
+Because you've fessed up to making this thing, you probably aren't getting fired but you'll definitely not be on anyone's Crumbl Cookies gift list
+
+```{r}
+ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
+  geom_bar(stat="identity",
+           color = "#003058", #This is Brooks Blue UT Branding.
+           fill = "#003058") +
+  labs(title = "Associate Degrees Awarded",
+       subtitle = "Credentials by academic year", #Claim responsibility.
+       caption = "Data supplied by OIE",
+       x = 'Academic Year',
+       y = 'Credentials Awarded')
+```
+
+Now we're getting somewhere! Using geom_text, the associates degrees awarded headcount by academic year has been labeled. 
+
+This is a usable visualization, but there is room for improvement.
+
+```{r}
+ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
+  geom_bar(stat="identity",
+           color = "#003058", #This is Brooks Blue UT Branding.
+           fill = "#003058") +
+  labs(title = "Associate Degrees Awarded",
+       subtitle = "Credentials by academic year",
+       caption = "Data supplied by OIE", #Take ownership.
+       x = 'Academic Year',
+       y = 'Credentials Awarded') + 
+  geom_text(aes(label = headcount), size = 10/.pt, vjust = -.4)
+```
+
+By adding theme_minimal, the darker backround and grid disappear and reduce unnecessary clutter.
+
+```{r}
+ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
+  geom_bar(stat="identity",
+           color = "#003058", #This is Brooks Blue UT Branding.
+           fill = "#003058") +
+  labs(title = "Associate Degrees Awarded",
+       subtitle = "Credentials by academic year",
+       caption = "Data supplied by OIE", #Take ownership.
+       x = 'Academic Year',
+       y = 'Credentials Awarded') + 
+  geom_text(aes(label = headcount), size = 10/.pt, vjust = -.4) +
+  theme_minimal()
+```
+
+Finally, by providing some more cleanup to the theme, we have a complete bar chart that delivers the data in both visual and text formats.
+
+Ok. Nobody is getting fired. I should have brought cookies.
+
+```{r}
+ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
+  geom_bar(stat="identity",
+           color = "#003058", #This is Brooks Blue UT Branding.
+           fill = "#003058") +
+  labs(title = "Associate Degrees Awarded",
+       subtitle = "Credentials by academic year",
+       caption = "Data supplied by OIE", #Take ownership.
+       x = 'Academic Year',
+       y = 'Credentials Awarded') + 
+  geom_text(aes(label = headcount), size = 10/.pt, vjust = -.4) +
+  theme_minimal() +
+  theme(
+    panel.grid.major= element_blank(),
+    panel.grid.minor= element_blank(),
+    plot.subtitle = element_text(color = "#a6a6a6", size = 10),
+    plot.caption = element_text(color = '#a6a6a6', size = 8, face = 'italic')
+  )
+
+```
+# There is no need to reinvent the wheel.
+
+One of the best things about creating visualizations using ggplot is that the code is easily modifed and repurposed. Save time and energy: Copy, paste, edit, knit. When I make something I like and will use often, I save an example in an R project dedicated to miscellaneous tricks that I have learned.
+
+Starting again, here we are going to create the same style of barchart above but now we'll filter the data to show us the number of bachelors degrees awarded by academic year over time.
+
+```{r, echo = FALSE}
+bachelors_df <- graduation_raw %>%
+  filter(degree == 'Bachelors') %>%
+  select(academic_year_desc, degree, headcount) %>%
+  group_by(academic_year_desc, degree) %>%
+  summarise(headcount = n(), .groups = "drop")
+```
+
+Here all you are changing is the name of the dataframe, the bar color, and the title label.
+
+I started getting picky about the formatting on the headcount bars, I wanted the totals over 1K formatted with commas. After digging around in Stack Overflow, I found my answer.
+
+https://stackoverflow.com/questions/56490813/how-do-i-add-a-comma-separator-to-a-text-label-in-geom-text
+
+```{r, echo=FALSE}
+ggplot(bachelors_df, aes(x = academic_year_desc, y = headcount)) +
+  geom_bar(stat="identity",
+           color = "#BA1C21", ## This is Rock Red from UT Branding.
+           fill = "#BA1C21") +
+    labs(title = "Bachelors Degrees Awarded",
+       subtitle = "Credentials by academic year",
+       caption = "Data supplied by OIE",
+       x = 'Academic Year',
+       y = 'Credentials Awarded') + 
+  geom_text(aes(label = scales::comma(headcount)), ## Formatting headcount with commas trick.
+            size = 8/ .pt, vjust = -.4) + 
+    theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.subtitle = element_text(color = "#a6a6a6", size = 10),
+    plot.caption = element_text(color = '#a6a6a6', size = 8, face = 'italic')
+  )
+
+
+```
+
+# Useful Stuff
+
+- geom_text & geom_label
+  - https://ggplot2.tidyverse.org/reference/geom_text.html
+  
+- geom_text aesthetics vignette:
+  - https://ggplot2.tidyverse.org/reference/geom_text.html
+  
