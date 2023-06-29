@@ -16,13 +16,19 @@ Using ggplot2, let's walk through making a bar chart that goes from gross to gre
 
 Begin by bringing in the data. Here I am connecting SQL I wrote that answers a request I have to show the growth of credentials awarded to graduating students over time by degree type.
 
-```{r, echo = FALSE}
+```{r}
 graduation_raw <- utHelpR::get_data_from_sql_file(file_name="graduation.sql",
                                                dsn="edify",
                                                context="project")
 ```
 
-Make a dataframe filtered to use only associates data from the degree column from graduation_raw.
+```{r}
+test <- utHelpR::get_data_from_sql_file(file_name="test.sql",
+                                               dsn="edify",
+                                               context="project")
+```
+
+Make a dataframe filtered to use only associates from the degree column in graduation_raw.
 
 ```{r}
 associates_df <- graduation_raw %>%
@@ -34,27 +40,27 @@ associates_df <- graduation_raw %>%
 
 With our new dataframe, it's time to bring in ggplot to build a bar chart.
 
-Ew, David!
+```{r}
+ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
+  geom_bar(stat = "identity")
+```
+
+![EW](ew.png)
 
 (Also, a good way to get fired.)
 
 This chart tells the viewer nothing. There is no way to determine what headcount is being measured by academic year.
 
-```{r, echo=FALSE}
-ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
-  geom_bar(stat = "identity")
-```
+Moving on...
 
-A little better, still basic. We've added some color and some labels so it is known that the headcount is associates degrees awarded by academic year, but we still don't know how many associates degrees are represented by each bar of the chart. 
-
-We have also claimed responsibility for "Who made this?"
+A little better, still basic. We've added some color and added/formatted some labels so it is clear that the headcount is associates degrees awarded by academic year, but we still don't know how many associates degrees are represented by each bar of the chart. We have also claimed responsibility in the event someone demands to know "Who made this?"
 
 Because you've fessed up to making this thing, you probably aren't getting fired but you'll definitely not be on anyone's Crumbl Cookies gift list
 
 ```{r}
 ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
   geom_bar(stat="identity",
-           color = "#003058", #This is Brooks Blue UT Branding.
+           color = "#003058", #This hex code is Brooks Blue UT Branding.
            fill = "#003058") +
   labs(title = "Associate Degrees Awarded",
        subtitle = "Credentials by academic year", #Claim responsibility.
@@ -70,7 +76,7 @@ This is a usable visualization, but there is room for improvement.
 ```{r}
 ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
   geom_bar(stat="identity",
-           color = "#003058", #This is Brooks Blue UT Branding.
+           color = "#003058", #This hex code is Brooks Blue UT Branding.
            fill = "#003058") +
   labs(title = "Associate Degrees Awarded",
        subtitle = "Credentials by academic year",
@@ -80,12 +86,12 @@ ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
   geom_text(aes(label = headcount), size = 10/.pt, vjust = -.4)
 ```
 
-By adding theme_minimal, the darker backround and grid disappear and reduce unnecessary clutter.
+By adding theme_minimal, the darker background disappears and grid dims to reduce unnecessary visual clutter.
 
 ```{r}
 ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
   geom_bar(stat="identity",
-           color = "#003058", #This is Brooks Blue UT Branding.
+           color = "#003058", #This hex code is Brooks Blue UT Branding.
            fill = "#003058") +
   labs(title = "Associate Degrees Awarded",
        subtitle = "Credentials by academic year",
@@ -98,12 +104,14 @@ ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
 
 Finally, by providing some more cleanup to the theme, we have a complete bar chart that delivers the data in both visual and text formats.
 
-Ok. Nobody is getting fired. I should have brought cookies.
+Ok. Nobody is getting fired. 
+
+(I should have brought cookies.)
 
 ```{r}
 ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
   geom_bar(stat="identity",
-           color = "#003058", #This is Brooks Blue UT Branding.
+           color = "#003058", #This hex code is Brooks Blue UT Branding.
            fill = "#003058") +
   labs(title = "Associate Degrees Awarded",
        subtitle = "Credentials by academic year",
@@ -122,9 +130,11 @@ ggplot(associates_df, aes(x = academic_year_desc, y = headcount)) +
 ```
 # There is no need to reinvent the wheel.
 
-One of the best things about creating visualizations using ggplot is that the code is easily modifed and repurposed. Save time and energy: Copy, paste, edit, knit. When I make something I like and will use often, I save an example in an R project dedicated to miscellaneous tricks that I have learned.
+One of the best things about creating visualizations using ggplot is that code is easily modified and repurposed. Save time and energy/wark smarter not harder: Copy, paste, edit, knit. 
 
-Starting again, here we are going to create the same style of barchart above but now we'll filter the data to show us the number of bachelors degrees awarded by academic year over time.
+When I make something I like and will use often, I save an example in an R project dedicated to miscellaneous tricks that I have learned.
+
+Starting again, here we are going to create the same style of bar chart above but now we'll filter the data to show us the number of bachelors degrees awarded by academic year over time.
 
 ```{r, echo = FALSE}
 bachelors_df <- graduation_raw %>%
@@ -143,11 +153,11 @@ https://stackoverflow.com/questions/56490813/how-do-i-add-a-comma-separator-to-a
 ```{r, echo=FALSE}
 ggplot(bachelors_df, aes(x = academic_year_desc, y = headcount)) +
   geom_bar(stat="identity",
-           color = "#BA1C21", ## This is Rock Red from UT Branding.
+           color = "#BA1C21", ## This hex code is Rock Red from UT Branding.
            fill = "#BA1C21") +
     labs(title = "Bachelors Degrees Awarded",
        subtitle = "Credentials by academic year",
-       caption = "Data supplied by OIE",
+       caption = "Data supplied by OIE", #Take ownership.
        x = 'Academic Year',
        y = 'Credentials Awarded') + 
   geom_text(aes(label = scales::comma(headcount)), ## Formatting headcount with commas trick.
